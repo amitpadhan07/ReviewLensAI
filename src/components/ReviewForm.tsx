@@ -41,7 +41,7 @@ export default function ReviewForm({ onSubmit, isLoading }: ReviewFormProps) {
     setError("");
   };
 
-  const useSample = (sample: string) => {
+  const handleUseSample = (sample: string) => {
     setText(sample);
     setError("");
   };
@@ -120,7 +120,7 @@ export default function ReviewForm({ onSubmit, isLoading }: ReviewFormProps) {
             <button
               key={idx}
               type="button"
-              onClick={() => useSample(sample)}
+              onClick={() => handleUseSample(sample)}
               disabled={isLoading}
               className="text-left p-2.5 rounded-lg border border-stone-100 bg-stone-50 hover:bg-emerald-50/50 hover:border-emerald-200 transition-all text-xs text-stone-600 truncate"
             >

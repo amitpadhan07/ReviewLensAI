@@ -84,7 +84,7 @@ export default function ResultCard({ result }: ResultCardProps) {
       {/* Submitted Review Snippet */}
       <div className="p-6 bg-stone-50/50">
         <span className="text-xs font-semibold text-stone-400 uppercase tracking-wider block mb-2">Analyzed Review</span>
-        <p className="text-stone-700 text-sm italic leading-relaxed">"{result.reviewText}"</p>
+        <p className="text-stone-700 text-sm italic leading-relaxed">&ldquo;{result.reviewText}&rdquo;</p>
       </div>
 
       {/* Suggested Auto Response */}

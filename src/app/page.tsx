@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Brain, MessageSquareCode, BarChart3, History, ArrowRight, ShieldCheck, TreePine } from "lucide-react";
+import { Brain, MessageSquareCode, BarChart3, ArrowRight, ShieldCheck, TreePine } from "lucide-react";
 
 export default function Home() {
   const features = [
