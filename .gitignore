@@ -41,4 +41,4 @@ yarn-error.log*
 next-env.d.ts
 
 #task file
-TASKS.node
+/docs/TASKS.node

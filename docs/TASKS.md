@@ -2,9 +2,9 @@
 
 ## Project Status
 
-**Current Day**: Day 3
-**Overall Progress**: Database layer integrated, GET APIs for Reviews & Dashboard, and connected UI client states.
-**Last Updated**: 2026-06-13
+**Current Day**: Day 4
+**Overall Progress**: Database layer integrated, GET APIs for Reviews & Dashboard, connected UI client states, and integrated Gemini AI for review analysis and auto-reply.
+**Last Updated**: 2026-06-14
 
 ---
 
@@ -30,14 +30,14 @@
 - [x] Build GET `/api/dashboard` API route.
 - [x] Connect Frontend pages with API routes (using React `fetch` and hooks).
 
+### Day 4
+- [x] Integrate Gemini API into `/api/analyze` POST route.
+- [x] Create AI service layer (`lib/gemini.ts`) with prompt engineering.
+- [x] Test review analysis backend (sentiment, category classification & professional response generation).
+
 ---
 
 ## Pending Tasks
-
-### Day 4
-- [ ] Integrate Gemini API into `/api/analyze` POST route.
-- [ ] Create AI service layer (`lib/gemini.ts`) with prompt engineering.
-- [ ] Test review analysis backend (sentiment, category classification & professional response generation).
 
 ### Day 5
 - [ ] Build Dashboard Page.

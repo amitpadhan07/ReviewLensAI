@@ -7,6 +7,7 @@ import { BrainCircuit } from "lucide-react";
 
 export default function AnalyzerPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<{
     reviewText: string;
     sentiment: string;
@@ -14,67 +15,32 @@ export default function AnalyzerPage() {
     aiResponse: string;
   } | null>(null);
 
-  const handleAnalyze = (reviewText: string) => {
+  const handleAnalyze = async (reviewText: string) => {
     setIsLoading(true);
     setResult(null);
+    setError(null);
 
-    // Mock API Response delay (simulating network roundtrip)
-    setTimeout(() => {
-      // Determine Mock Sentiment
-      let sentiment = "Neutral";
-      const lowerText = reviewText.toLowerCase();
-      
-      const positiveWords = ["good", "great", "amazing", "excellent", "wonderful", "love", "delicious", "clean", "friendly", "comfortable", "scenic"];
-      const negativeWords = ["bad", "worst", "terrible", "poor", "dirty", "expensive", "disappointing", "low", "rough", "slow", "disappointed"];
-      
-      let posCount = 0;
-      let negCount = 0;
-      
-      positiveWords.forEach(word => {
-        if (lowerText.includes(word)) posCount++;
-      });
-      negativeWords.forEach(word => {
-        if (lowerText.includes(word)) negCount++;
+    try {
+      const res = await fetch("/api/analyze", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ reviewText }),
       });
 
-      if (posCount > negCount) {
-        sentiment = "Positive";
-      } else if (negCount > posCount) {
-        sentiment = "Negative";
-      }
-
-      // Determine Mock Category
-      let category = "Experience";
-      if (lowerText.includes("food") || lowerText.includes("meal") || lowerText.includes("cook") || lowerText.includes("breakfast") || lowerText.includes("dinner")) {
-        category = "Food";
-      } else if (lowerText.includes("clean") || lowerText.includes("dirty") || lowerText.includes("wash") || lowerText.includes("bathroom") || lowerText.includes("neat")) {
-        category = "Cleanliness";
-      } else if (lowerText.includes("location") || lowerText.includes("view") || lowerText.includes("river") || lowerText.includes("mountain") || lowerText.includes("road") || lowerText.includes("scenic")) {
-        category = "Location";
-      } else if (lowerText.includes("host") || lowerText.includes("staff") || lowerText.includes("owner") || lowerText.includes("people") || lowerText.includes("friendly")) {
-        category = "Host";
-      } else if (lowerText.includes("price") || lowerText.includes("expensive") || lowerText.includes("worth") || lowerText.includes("cost") || lowerText.includes("value")) {
-        category = "Value";
-      }
-
-      // Generate Suggested Response
-      let aiResponse = "";
-      if (sentiment === "Positive") {
-        aiResponse = `Dear Guest,\n\nThank you so much for your wonderful review! We are absolutely thrilled to hear you had such a great time during your stay. We take great pride in our homestay's ${category.toLowerCase()} and hospitality, and it means the world to our team to receive such positive feedback. We hope to welcome you back to our eco-sanctuary in the near future!\n\nWarm regards,\nManagement Team`;
-      } else if (sentiment === "Negative") {
-        aiResponse = `Dear Guest,\n\nThank you for taking the time to share your feedback. We sincerely apologize that your experience did not meet your expectations, particularly regarding the ${category.toLowerCase()} during your stay. We take your comments seriously and are already addressing this with our team to ensure improvements are made. We hope you will give us another chance in the future to show you the high standard of hospitality we aim for.\n\nSincerely,\nManagement Team`;
+      const json = await res.json();
+      if (json.success) {
+        setResult(json.data);
       } else {
-        aiResponse = `Dear Guest,\n\nThank you for your review and for sharing your constructive feedback. We are glad you enjoyed parts of your stay, but also appreciate your notes on the ${category.toLowerCase()}. We are always looking for ways to improve our homestay experience and will use your input to refine our services. We hope to host you again for an even better stay.\n\nKind regards,\nManagement Team`;
+        setError(json.error || "Failed to analyze review.");
       }
-
-      setResult({
-        reviewText,
-        sentiment,
-        category,
-        aiResponse
-      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "An unexpected error occurred.";
+      setError(msg);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -98,7 +64,19 @@ export default function AnalyzerPage() {
           <ReviewForm onSubmit={handleAnalyze} isLoading={isLoading} />
         </div>
         
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 space-y-6">
+          {error && (
+            <div className="border border-rose-200 bg-rose-50/50 rounded-xl p-6 text-center space-y-3">
+              <div className="h-10 w-10 rounded-full bg-rose-100 text-rose-800 flex items-center justify-center mx-auto">
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-rose-800 text-sm">Analysis Failed</h3>
+              <p className="text-rose-600 text-xs leading-relaxed">{error}</p>
+            </div>
+          )}
+
           {result ? (
             <ResultCard result={result} />
           ) : (
