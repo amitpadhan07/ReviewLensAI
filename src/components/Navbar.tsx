@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Brain, History, LayoutDashboard, Menu, X, TreePine } from "lucide-react";
+import { Home, Brain, History, LayoutDashboard, Menu, X, TreePine, HelpCircle, LogIn } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -14,6 +14,8 @@ export default function Navbar() {
     { name: "Analyzer", href: "/analyzer", icon: Brain },
     { name: "History", href: "/history", icon: History },
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "About", href: "/about", icon: HelpCircle },
+    { name: "Login", href: "/login", icon: LogIn },
   ];
 
   return (

@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { Brain, MessageSquareCode, BarChart3, ArrowRight, ShieldCheck, TreePine } from "lucide-react";
+import { Brain, MessageSquareCode, BarChart3, ArrowRight, ShieldCheck } from "lucide-react";
+import Hero from "@/components/Hero";
+import Card from "@/components/Card";
 
 export default function Home() {
   const features = [
@@ -7,68 +9,40 @@ export default function Home() {
       title: "AI Sentiment Analysis",
       description: "Classifies guest feedback automatically as Positive, Neutral, or Negative so you can identify critical reviews instantly.",
       icon: Brain,
-      color: "text-emerald-600 bg-emerald-50",
+      color: "text-emerald-650 bg-emerald-50",
     },
     {
       title: "Topic Classification",
       description: "Automatically routes reviews into categories like Cleanliness, Food, Location, Host, Value, or overall Experience.",
       icon: ShieldCheck,
-      color: "text-blue-600 bg-blue-50",
+      color: "text-blue-650 bg-blue-50",
     },
     {
       title: "Smart Auto-Responses",
       description: "Drafts instant, professional replies customized to the guest's review, saving hours of manual drafting.",
       icon: MessageSquareCode,
-      color: "text-amber-600 bg-amber-50",
+      color: "text-amber-655 bg-amber-50",
     },
     {
       title: "Analytics Dashboard",
       description: "Presents statistics, category breakdowns, and sentiment distributions in clear, intuitive charts.",
       icon: BarChart3,
-      color: "text-purple-600 bg-purple-50",
+      color: "text-purple-650 bg-purple-50",
     },
   ];
 
   return (
     <div className="space-y-16 py-4">
       {/* Hero Section */}
-      <div className="bg-white border border-stone-200 rounded-2xl p-8 md:p-12 shadow-sm relative overflow-hidden">
-        {/* Soft natural green background gradient accent */}
-        <div className="absolute right-0 top-0 -mt-12 -mr-12 w-64 h-64 bg-emerald-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
-        <div className="absolute left-0 bottom-0 -mb-12 -ml-12 w-64 h-64 bg-stone-100 rounded-full blur-2xl opacity-60 pointer-events-none"></div>
-
-        <div className="relative z-10 max-w-3xl space-y-6">
-          <div className="inline-flex items-center space-x-2 bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1 rounded-full text-xs font-semibold">
-            <TreePine className="h-3.5 w-3.5" />
-            <span>AI-Driven Hospitality Solutions</span>
-          </div>
-
-          <h1 className="text-3xl md:text-5xl font-extrabold text-stone-900 tracking-tight leading-tight">
-            Transform Guest Reviews into <span className="text-emerald-700">Actionable Insights</span>
-          </h1>
-
-          <p className="text-base md:text-lg text-stone-600 leading-relaxed max-w-2xl">
-            A lightweight, AI-powered assistant designed specifically for homestays and eco-tourism operators. 
-            Instantly analyze guest feedback, identify sentiments, categorize topics, and draft polite, professional replies in seconds.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 pt-2">
-            <Link
-              href="/analyzer"
-              className="inline-flex items-center justify-center space-x-2 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold px-6 py-3.5 rounded-xl shadow-sm hover:shadow transition-all group"
-            >
-              <span>Analyze a Review</span>
-              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center justify-center space-x-2 bg-white hover:bg-stone-50 border border-stone-300 text-stone-700 font-semibold px-6 py-3.5 rounded-xl transition-all"
-            >
-              <span>View Dashboard</span>
-            </Link>
-          </div>
-        </div>
-      </div>
+      <Hero
+        title="Transform Guest Reviews into"
+        highlightText="Actionable Insights"
+        description="A lightweight, AI-powered assistant designed specifically for homestays and eco-tourism operators. Instantly analyze guest feedback, identify sentiments, categorize topics, and draft polite, professional replies in seconds."
+        primaryCtaText="Analyze a Review"
+        primaryCtaLink="/analyzer"
+        secondaryCtaText="View Dashboard"
+        secondaryCtaLink="/dashboard"
+      />
 
       {/* Quick Statistics Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -99,20 +73,15 @@ export default function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-          {features.map((feature, idx) => {
-            const Icon = feature.icon;
-            return (
-              <div key={idx} className="bg-white border border-stone-200 rounded-xl p-6 shadow-sm flex items-start space-x-4">
-                <div className={`p-3 rounded-lg shrink-0 ${feature.color}`}>
-                  <Icon className="h-6 w-6" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="font-bold text-stone-900 text-lg">{feature.title}</h3>
-                  <p className="text-stone-600 text-sm leading-relaxed">{feature.description}</p>
-                </div>
-              </div>
-            );
-          })}
+          {features.map((feature, idx) => (
+            <Card
+              key={idx}
+              title={feature.title}
+              description={feature.description}
+              icon={feature.icon}
+              color={feature.color}
+            />
+          ))}
         </div>
       </div>
 
