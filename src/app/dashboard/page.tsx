@@ -3,6 +3,19 @@
 import { useEffect, useState } from "react";
 import { LayoutDashboard, Tag, Smile, AlertCircle, HelpCircle, ArrowRight, Activity, Calendar } from "lucide-react";
 import Link from "next/link";
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid
+} from "recharts";
 
 interface Review {
   _id: string;
@@ -31,12 +44,35 @@ interface DashboardData {
   recentReviews: Review[];
 }
 
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    name: string;
+    value: number;
+    payload: any;
+  }>;
+}
+
+const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-stone-900 border border-stone-800 text-stone-105 p-2.5 rounded-lg text-xs shadow-md space-y-0.5">
+        <p className="font-bold text-white">{payload[0].name}</p>
+        <p className="text-stone-300">Reviews: <span className="font-semibold text-emerald-400">{payload[0].value}</span></p>
+      </div>
+    );
+  }
+  return null;
+};
+
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     async function fetchDashboardData() {
       try {
         const res = await fetch("/api/dashboard");
@@ -112,6 +148,16 @@ export default function DashboardPage() {
           ))}
         </div>
 
+        {/* Charts Loader */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {[1, 2].map((n) => (
+            <div key={n} className="bg-white border border-stone-200 rounded-xl p-6 h-80 animate-pulse space-y-4">
+              <div className="h-6 w-40 bg-stone-200 rounded"></div>
+              <div className="h-60 w-full bg-stone-100 rounded"></div>
+            </div>
+          ))}
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-4">
             <div className="h-6 w-32 bg-stone-200 rounded animate-pulse"></div>
@@ -140,12 +186,23 @@ export default function DashboardPage() {
 
   const maxCategoryCount = Math.max(...Object.values(data.categoryCounts), 1);
 
+  const sentimentChartData = [
+    { name: "Positive", value: data.sentimentCounts.Positive, color: "#059669" },
+    { name: "Neutral", value: data.sentimentCounts.Neutral, color: "#d97706" },
+    { name: "Negative", value: data.sentimentCounts.Negative, color: "#e11d48" }
+  ].filter(item => item.value > 0);
+
+  const categoryChartData = Object.entries(data.categoryCounts).map(([name, value]) => ({
+    name,
+    value
+  }));
+
   return (
     <div className="max-w-6xl mx-auto space-y-8 py-4 px-4 sm:px-0">
       {/* Header */}
       <div className="flex items-center space-x-3">
         <div className="p-3 bg-emerald-100 text-emerald-800 rounded-xl">
-          <LayoutDashboard className="h-6 w-6 animate-pulse" />
+          <LayoutDashboard className="h-6 w-6 text-emerald-700" />
         </div>
         <div className="space-y-0.5">
           <h1 className="text-2xl font-extrabold text-stone-900 tracking-tight">Analytics Dashboard</h1>
@@ -199,6 +256,93 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Visual Charts */}
+      {isMounted && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Sentiment Distribution Pie Chart */}
+          <div className="bg-white border border-stone-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+            <div>
+              <h2 className="font-bold text-lg text-stone-900 mb-4 flex items-center space-x-2">
+                <Smile className="h-5 w-5 text-emerald-650" />
+                <span>Sentiment Distribution</span>
+              </h2>
+            </div>
+            <div className="h-64 w-full flex items-center justify-center">
+              {data.totalReviews > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={sentimentChartData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={4}
+                      dataKey="value"
+                    >
+                      {sentimentChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={36} 
+                      iconType="circle"
+                      formatter={(value) => <span className="text-xs text-stone-600 font-semibold">{value}</span>}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-stone-400 text-sm">
+                  No review sentiments to visualize
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Category Distribution Bar Chart */}
+          <div className="bg-white border border-stone-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between">
+            <div>
+              <h2 className="font-bold text-lg text-stone-900 mb-4 flex items-center space-x-2">
+                <Tag className="h-5 w-5 text-emerald-650" />
+                <span>Category Distribution</span>
+              </h2>
+            </div>
+            <div className="h-64 w-full flex items-center justify-center">
+              {data.totalReviews > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={categoryChartData}
+                    margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e7e5e4" />
+                    <XAxis 
+                      dataKey="name" 
+                      tickLine={false} 
+                      axisLine={false} 
+                      tick={{ fill: '#78716c', fontSize: 11 }}
+                    />
+                    <YAxis 
+                      tickLine={false} 
+                      axisLine={false} 
+                      tick={{ fill: '#78716c', fontSize: 11 }}
+                      allowDecimals={false}
+                    />
+                    <Tooltip content={<CustomTooltip />} />
+                    <Bar dataKey="value" fill="#047857" radius={[4, 4, 0, 0]} name="Reviews" />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-stone-400 text-sm">
+                  No review categories to visualize
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Layout Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
